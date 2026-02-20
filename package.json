@@ -1,0 +1,38 @@
+{
+  "name": "devtok",
+  "version": "1.0.0",
+  "description": "Script → Animated TikTok Overlay Pipeline",
+  "type": "module",
+  "main": "src/index.tsx",
+  "scripts": {
+    "start": "remotion studio src/index.tsx",
+    "build": "remotion render src/index.tsx Overlay out/overlay.webm --codec vp8",
+    "overlay": "tsx src/cli/index.ts",
+    "preview": "remotion preview src/index.tsx"
+  },
+  "keywords": [
+    "tiktok",
+    "overlay",
+    "remotion",
+    "automation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1",
+  "dependencies": {
+    "@remotion/cli": "^4.0.425",
+    "commander": "^14.0.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "remotion": "^4.0.425",
+    "shiki": "^3.22.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}

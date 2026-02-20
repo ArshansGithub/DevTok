@@ -1,0 +1,17 @@
+Microservices vs Monolith — When to Split
+
+Everyone wants to go microservices. But should you?
+
+A monolith is a single deployable unit. One repo, one database, one deploy pipeline. It's simple. It's fast to develop. And honestly, it's probably what you need if your team is under 10 people.
+
+Microservices split your app into independent services. Each one has its own database, its own deploy, its own scaling. Sounds great on paper.
+
+But here's the hidden cost. You now need service discovery. You need distributed tracing. You need to handle network failures between services. You need an API gateway. You need to deal with data consistency across services.
+
+That's a LOT of infrastructure. Netflix can handle it. Can your 3-person startup?
+
+The smart path: start monolith. Split when you feel pain. The pain points tell you WHERE to split. Don't split because a blog post told you to.
+
+When you do split, start with the service that has the most independent data model and the highest scaling needs. Usually that's auth, notifications, or media processing.
+
+Keep the core business logic together until you have a real reason to separate it.

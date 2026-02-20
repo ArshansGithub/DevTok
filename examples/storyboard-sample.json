@@ -1,0 +1,71 @@
+[
+    {
+        "start": 0,
+        "end": 2.5,
+        "type": "title",
+        "data": {
+            "text": "ESM vs CommonJS",
+            "subtitle": "Why your imports keep breaking"
+        }
+    },
+    {
+        "start": 2.5,
+        "end": 6,
+        "type": "code-evolve",
+        "data": {
+            "language": "ts",
+            "from": "const express = require('express');",
+            "to": "import express from 'express';",
+            "caption": "The migration everyone dreads"
+        }
+    },
+    {
+        "start": 6,
+        "end": 9.5,
+        "type": "bullet",
+        "data": {
+            "title": "Key Differences",
+            "bullets": [
+                "ESM is statically analyzed",
+                "CJS loads synchronously",
+                "ESM enables tree-shaking"
+            ]
+        }
+    },
+    {
+        "start": 9.5,
+        "end": 13,
+        "type": "code-block",
+        "data": {
+            "language": "json",
+            "code": "{\n  \"type\": \"module\"\n}",
+            "fileName": "package.json"
+        }
+    },
+    {
+        "start": 13,
+        "end": 16.5,
+        "type": "metaphor-stack",
+        "data": {
+            "title": "CJS Baggage",
+            "layers": [
+                "require() calls",
+                "module.exports",
+                "__dirname hacks",
+                "No tree-shaking"
+            ]
+        }
+    },
+    {
+        "start": 16.5,
+        "end": 19,
+        "type": "callout",
+        "data": {
+            "text": "Write ESM. Ship dual. Everyone wins.",
+            "emphasizedTokens": [
+                "ESM",
+                "dual"
+            ]
+        }
+    }
+]

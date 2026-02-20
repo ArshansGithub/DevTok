@@ -1,0 +1,15 @@
+Why My Build Broke — A Debugging Story
+
+So I pushed a PR and CI went red. The error? "Cannot find module './utils'."
+
+I checked the import. It was fine. I checked the file. It existed. I ran it locally — worked perfectly.
+
+Turns out the problem was case sensitivity. My Mac doesn't care if you write Utils or utils. But the Linux CI runner does. The file was utils.ts but my import said ./Utils.
+
+Fix was simple — rename the import to match the exact casing. But this wasted 45 minutes.
+
+Lesson learned: always match file casing exactly. Better yet, add a linter rule. eslint-plugin-import has a "no-unresolved" rule that catches this.
+
+Another tip: run your tests in a Docker container that matches your CI environment. You'll catch these issues before pushing.
+
+Never trust your local machine to be the source of truth. CI is the real world.

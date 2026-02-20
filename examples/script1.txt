@@ -1,0 +1,13 @@
+ESM vs CommonJS — What's the Actual Difference?
+
+You've probably seen "Cannot use import statement outside a module" at least once.
+
+Here's the deal. CommonJS — that's your require and module.exports — loads modules synchronously. It was designed for Node.js back when nobody cared about tree-shaking.
+
+ESM — that's import/export — is the modern standard. It's statically analyzable, which means bundlers can tree-shake unused code.
+
+The migration isn't hard. Change require to import. Change module.exports to export default. Add "type": "module" to your package.json.
+
+But here's the catch — not every npm package supports ESM yet. Some still ship CJS only. You might need to use dynamic import() for those.
+
+The real move? Write ESM, configure your tsconfig to output both formats, and ship dual packages. Your users with CJS and ESM setups will both be happy.
