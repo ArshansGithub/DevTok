@@ -1,26 +1,30 @@
 /**
  * Remotion Overlay Composition
- * Takes storyboard data and renders each scene in sequence.
- *
- * This component reads a storyboard from an input prop and maps each beat
- * to its corresponding scene component using Remotion's <Sequence>.
+ * Maps storyboard beats to code-centric scene components.
  */
 
 import React from 'react';
-import { AbsoluteFill, Sequence, staticFile, useVideoConfig } from 'remotion';
+import { AbsoluteFill, Sequence, useVideoConfig } from 'remotion';
 import type { Storyboard, Scene } from '../schema';
 import { TitleScene } from './TitleScene';
-import { BulletScene } from './BulletScene';
+import { CalloutScene } from './CalloutScene';
 import { CodeBlockScene } from './CodeBlockScene';
 import { CodeEvolveScene } from './CodeEvolveScene';
-import { CalloutScene } from './CalloutScene';
-import { DiagramScene } from './DiagramScene';
-import { MetaphorStackScene } from './MetaphorStackScene';
+import { CodeDiffScene } from './CodeDiffScene';
+import { CodeCompareScene } from './CodeCompareScene';
+import { CodeHighlightScene } from './CodeHighlightScene';
+import { TerminalScene } from './TerminalScene';
+import { CodeScrollScene } from './CodeScrollScene';
 
 export interface OverlayProps {
     storyboard: Storyboard;
-    /** Pre-computed Shiki HTML per scene index (key = scene index) */
-    highlightedCode?: Record<number, { html?: string; fromHtml?: string; toHtml?: string }>;
+    highlightedCode?: Record<number, {
+        html?: string;
+        fromHtml?: string;
+        toHtml?: string;
+        leftHtml?: string;
+        rightHtml?: string;
+    }>;
 }
 
 function renderScene(
@@ -29,30 +33,34 @@ function renderScene(
     durationInFrames: number,
     highlightedCode?: OverlayProps['highlightedCode'],
 ) {
-    const highlights = highlightedCode?.[index];
+    const h = highlightedCode?.[index];
 
     switch (scene.type) {
         case 'title':
             return <TitleScene data={scene.data} />;
-        case 'bullet':
-            return <BulletScene data={scene.data} />;
+        case 'callout':
+            return <CalloutScene data={scene.data} />;
         case 'code-block':
-            return <CodeBlockScene data={scene.data} highlightedHtml={highlights?.html} />;
+            return <CodeBlockScene data={scene.data} highlightedHtml={h?.html} />;
         case 'code-evolve':
             return (
                 <CodeEvolveScene
                     data={scene.data}
-                    fromHtml={highlights?.fromHtml}
-                    toHtml={highlights?.toHtml}
+                    fromHtml={h?.fromHtml}
+                    toHtml={h?.toHtml}
                     durationInFrames={durationInFrames}
                 />
             );
-        case 'callout':
-            return <CalloutScene data={scene.data} />;
-        case 'diagram':
-            return <DiagramScene data={scene.data} />;
-        case 'metaphor-stack':
-            return <MetaphorStackScene data={scene.data} />;
+        case 'code-diff':
+            return <CodeDiffScene data={scene.data} />;
+        case 'code-compare':
+            return <CodeCompareScene data={scene.data} leftHtml={h?.leftHtml} rightHtml={h?.rightHtml} />;
+        case 'code-highlight':
+            return <CodeHighlightScene data={scene.data} highlightedHtml={h?.html} />;
+        case 'terminal':
+            return <TerminalScene data={scene.data} durationInFrames={durationInFrames} />;
+        case 'code-scroll':
+            return <CodeScrollScene data={scene.data} highlightedHtml={h?.html} durationInFrames={durationInFrames} />;
         default:
             return null;
     }

@@ -8,7 +8,6 @@ import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import path from 'path';
 import type { Storyboard } from './schema';
 import { highlightCode } from './highlighter';
-import { DEFAULTS } from './config';
 
 export interface RenderOptions {
     storyboard: Storyboard;
@@ -21,12 +20,11 @@ export interface RenderOptions {
 
 /**
  * Pre-compute Shiki highlighted HTML for all code-related scenes.
- * This runs before rendering so the data can be passed as input props.
  */
 export async function preHighlightCode(
     storyboard: Storyboard,
-): Promise<Record<number, { html?: string; fromHtml?: string; toHtml?: string }>> {
-    const result: Record<number, { html?: string; fromHtml?: string; toHtml?: string }> = {};
+): Promise<Record<number, { html?: string; fromHtml?: string; toHtml?: string; leftHtml?: string; rightHtml?: string }>> {
+    const result: Record<number, any> = {};
 
     for (let i = 0; i < storyboard.length; i++) {
         const scene = storyboard[i];
@@ -38,6 +36,16 @@ export async function preHighlightCode(
             const fromHtml = await highlightCode(scene.data.from, scene.data.language);
             const toHtml = await highlightCode(scene.data.to, scene.data.language);
             result[i] = { fromHtml, toHtml };
+        } else if (scene.type === 'code-compare') {
+            const leftHtml = await highlightCode(scene.data.left.code, scene.data.language);
+            const rightHtml = await highlightCode(scene.data.right.code, scene.data.language);
+            result[i] = { leftHtml, rightHtml };
+        } else if (scene.type === 'code-highlight') {
+            const html = await highlightCode(scene.data.code, scene.data.language);
+            result[i] = { html };
+        } else if (scene.type === 'code-scroll') {
+            const html = await highlightCode(scene.data.code, scene.data.language);
+            result[i] = { html };
         }
     }
 
@@ -134,7 +142,7 @@ export async function renderOverlay(options: RenderOptions): Promise<void> {
             execSync(previewCmd.join(' '), {
                 stdio: 'pipe',
                 cwd: process.cwd(),
-                timeout: 60_000,
+                timeout: 120_000,
             });
         } catch {
             console.warn(`[render] Warning: Could not generate preview frame ${frameNum}`);

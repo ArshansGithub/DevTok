@@ -5,6 +5,8 @@ const BaseSceneSchema = z.object({
 	end: z.number(),
 });
 
+// ─── Kept Scenes ────────────────────────────────────────────
+
 export const TitleSceneSchema = BaseSceneSchema.extend({
 	type: z.literal('title'),
 	data: z.object({
@@ -13,11 +15,11 @@ export const TitleSceneSchema = BaseSceneSchema.extend({
 	}),
 });
 
-export const BulletSceneSchema = BaseSceneSchema.extend({
-	type: z.literal('bullet'),
+export const CalloutSceneSchema = BaseSceneSchema.extend({
+	type: z.literal('callout'),
 	data: z.object({
-		title: z.string().optional(),
-		bullets: z.array(z.string()),
+		text: z.string(),
+		emphasizedTokens: z.array(z.string()).optional(),
 	}),
 });
 
@@ -40,7 +42,7 @@ export const CodeEvolveSceneSchema = BaseSceneSchema.extend({
 			.array(
 				z.object({
 					token: z.string(),
-					at: z.number(), // Percentage through the scene (0 to 1)
+					at: z.number(), // 0–1 fraction of beat duration
 				}),
 			)
 			.optional(),
@@ -48,57 +50,89 @@ export const CodeEvolveSceneSchema = BaseSceneSchema.extend({
 	}),
 });
 
-export const CalloutSceneSchema = BaseSceneSchema.extend({
-	type: z.literal('callout'),
+// ─── New Code-Centric Scenes ────────────────────────────────
+
+export const CodeDiffSceneSchema = BaseSceneSchema.extend({
+	type: z.literal('code-diff'),
 	data: z.object({
-		text: z.string(),
-		emphasizedTokens: z.array(z.string()).optional(),
+		language: z.string(),
+		/** Each line prefixed with "+" (added), "-" (removed), or " " (context) */
+		lines: z.array(z.string()),
+		fileName: z.string().optional(),
+		caption: z.string().optional(),
 	}),
 });
 
-export const DiagramSceneSchema = BaseSceneSchema.extend({
-	type: z.literal('diagram'),
+export const CodeCompareSceneSchema = BaseSceneSchema.extend({
+	type: z.literal('code-compare'),
 	data: z.object({
-		nodes: z.array(z.string()),
-		edges: z.array(
-			z.object({
-				from: z.string(),
-				to: z.string(),
-				label: z.string().optional(),
-			}),
-		),
+		language: z.string(),
+		left: z.object({
+			label: z.string(),
+			code: z.string(),
+		}),
+		right: z.object({
+			label: z.string(),
+			code: z.string(),
+		}),
 	}),
 });
 
-export const MetaphorStackSceneSchema = BaseSceneSchema.extend({
-	type: z.literal('metaphor-stack'),
+export const CodeHighlightSceneSchema = BaseSceneSchema.extend({
+	type: z.literal('code-highlight'),
 	data: z.object({
-		title: z.string().optional(),
-		layers: z.array(z.string()), // Representing patches, tech debt layers, etc.
+		language: z.string(),
+		code: z.string(),
+		/** 1-indexed line numbers to highlight */
+		highlightLines: z.array(z.number()),
+		fileName: z.string().optional(),
+		caption: z.string().optional(),
 	}),
 });
 
-// A single segment/beat in the storyboard
+export const TerminalSceneSchema = BaseSceneSchema.extend({
+	type: z.literal('terminal'),
+	data: z.object({
+		command: z.string(),
+		output: z.string(),
+		caption: z.string().optional(),
+	}),
+});
+
+export const CodeScrollSceneSchema = BaseSceneSchema.extend({
+	type: z.literal('code-scroll'),
+	data: z.object({
+		language: z.string(),
+		code: z.string(),
+		fileName: z.string().optional(),
+	}),
+});
+
+// ─── Union & Exports ────────────────────────────────────────
+
 export const SceneSchema = z.discriminatedUnion('type', [
 	TitleSceneSchema,
-	BulletSceneSchema,
+	CalloutSceneSchema,
 	CodeBlockSceneSchema,
 	CodeEvolveSceneSchema,
-	CalloutSceneSchema,
-	DiagramSceneSchema,
-	MetaphorStackSceneSchema,
+	CodeDiffSceneSchema,
+	CodeCompareSceneSchema,
+	CodeHighlightSceneSchema,
+	TerminalSceneSchema,
+	CodeScrollSceneSchema,
 ]);
 
-// The entire storyboard output
 export const StoryboardSchema = z.array(SceneSchema);
 
 // Types
 export type TitleScene = z.infer<typeof TitleSceneSchema>;
-export type BulletScene = z.infer<typeof BulletSceneSchema>;
+export type CalloutScene = z.infer<typeof CalloutSceneSchema>;
 export type CodeBlockScene = z.infer<typeof CodeBlockSceneSchema>;
 export type CodeEvolveScene = z.infer<typeof CodeEvolveSceneSchema>;
-export type CalloutScene = z.infer<typeof CalloutSceneSchema>;
-export type DiagramScene = z.infer<typeof DiagramSceneSchema>;
-export type MetaphorStackScene = z.infer<typeof MetaphorStackSceneSchema>;
+export type CodeDiffScene = z.infer<typeof CodeDiffSceneSchema>;
+export type CodeCompareScene = z.infer<typeof CodeCompareSceneSchema>;
+export type CodeHighlightScene = z.infer<typeof CodeHighlightSceneSchema>;
+export type TerminalScene = z.infer<typeof TerminalSceneSchema>;
+export type CodeScrollScene = z.infer<typeof CodeScrollSceneSchema>;
 export type Scene = z.infer<typeof SceneSchema>;
 export type Storyboard = z.infer<typeof StoryboardSchema>;
