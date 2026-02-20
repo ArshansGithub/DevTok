@@ -1,25 +1,15 @@
 import React from 'react';
-import {
-    interpolate,
-    spring,
-    useCurrentFrame,
-    useVideoConfig,
-} from 'remotion';
+import { useCurrentFrame, useVideoConfig } from 'remotion';
 import { STYLE } from '../config';
+import { useSceneTransition } from './useSceneTransition';
 import type { CodeBlockScene as CodeBlockSceneType } from '../schema';
 
 export const CodeBlockScene: React.FC<{
     data: CodeBlockSceneType['data'];
     highlightedHtml?: string;
-}> = ({ data, highlightedHtml }) => {
-    const frame = useCurrentFrame();
-    const { fps } = useVideoConfig();
-
-    const containerSpring = spring({ frame, fps, config: STYLE.motion.spring });
-    const containerOpacity = interpolate(frame, [0, 8], [0, 1], {
-        extrapolateRight: 'clamp',
-    });
-    const scaleUp = interpolate(containerSpring, [0, 1], [0.95, 1]);
+    durationInFrames: number;
+}> = ({ data, highlightedHtml, durationInFrames }) => {
+    const transition = useSceneTransition(durationInFrames);
 
     return (
         <div
@@ -28,11 +18,9 @@ export const CodeBlockScene: React.FC<{
                 top: 140,
                 left: STYLE.layout.padding - 8,
                 right: STYLE.layout.padding - 8,
-                opacity: containerOpacity,
-                transform: `scale(${scaleUp})`,
+                ...transition.style,
             }}
         >
-            {/* Window chrome */}
             <div
                 style={{
                     background: STYLE.colors.surface,
@@ -52,39 +40,11 @@ export const CodeBlockScene: React.FC<{
                         borderBottom: `1px solid ${STYLE.colors.border}`,
                     }}
                 >
-                    <div
-                        style={{
-                            width: 12,
-                            height: 12,
-                            borderRadius: '50%',
-                            background: '#EF4444',
-                        }}
-                    />
-                    <div
-                        style={{
-                            width: 12,
-                            height: 12,
-                            borderRadius: '50%',
-                            background: '#F59E0B',
-                        }}
-                    />
-                    <div
-                        style={{
-                            width: 12,
-                            height: 12,
-                            borderRadius: '50%',
-                            background: '#22C55E',
-                        }}
-                    />
+                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#EF4444' }} />
+                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#F59E0B' }} />
+                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#22C55E' }} />
                     {data.fileName && (
-                        <span
-                            style={{
-                                fontFamily: STYLE.fonts.mono,
-                                fontSize: 14,
-                                color: STYLE.colors.textMuted,
-                                marginLeft: 8,
-                            }}
-                        >
+                        <span style={{ fontFamily: STYLE.fonts.mono, fontSize: 14, color: STYLE.colors.textMuted, marginLeft: 8 }}>
                             {data.fileName}
                         </span>
                     )}
@@ -102,7 +62,7 @@ export const CodeBlockScene: React.FC<{
                     </span>
                 </div>
 
-                {/* Code area */}
+                {/* Code */}
                 <div
                     style={{
                         padding: '24px 24px',

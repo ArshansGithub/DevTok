@@ -1,0 +1,97 @@
+[
+    {
+        "start": 0,
+        "end": 2,
+        "type": "title",
+        "data": {
+            "text": "Stop Using console.log",
+            "subtitle": "There's a better way to debug"
+        }
+    },
+    {
+        "start": 2,
+        "end": 6,
+        "type": "code-scroll",
+        "data": {
+            "language": "ts",
+            "code": "async function processOrder(order: Order) {\n  console.log('order', order)\n  const user = await getUser(order.userId)\n  console.log('user', user)\n  const inventory = await checkInventory(order.items)\n  console.log('inventory', inventory)\n  const payment = await chargeCard(user.cardId, order.total)\n  console.log('payment', payment)\n  const shipping = await createShipment(order, user.address)\n  console.log('shipping', shipping)\n  await sendConfirmation(user.email, order.id)\n  console.log('done')\n  return { orderId: order.id, status: 'confirmed' }\n}",
+            "fileName": "orders.ts"
+        }
+    },
+    {
+        "start": 6,
+        "end": 10,
+        "type": "code-highlight",
+        "data": {
+            "language": "ts",
+            "code": "async function processOrder(order: Order) {\n  console.log('order', order)\n  const user = await getUser(order.userId)\n  console.log('user', user)\n  const inventory = await checkInventory(order.items)\n  console.log('inventory', inventory)\n  const payment = await chargeCard(user.cardId, order.total)\n  console.log('payment', payment)\n}",
+            "highlightLines": [
+                2,
+                4,
+                6,
+                8
+            ],
+            "fileName": "orders.ts",
+            "caption": "Half your lines are debug noise"
+        }
+    },
+    {
+        "start": 10,
+        "end": 14.5,
+        "type": "code-evolve",
+        "data": {
+            "language": "ts",
+            "from": "console.log('payment', payment)\nconsole.log('user', user)\nconsole.log('inventory result:', inventory)",
+            "to": "const logger = createLogger('orders')\nlogger.info('payment processed', { payment })\nlogger.info('user loaded', { userId: user.id })\nlogger.debug('inventory check', { inventory })",
+            "caption": "Structured logging > console.log"
+        }
+    },
+    {
+        "start": 14.5,
+        "end": 18.5,
+        "type": "code-compare",
+        "data": {
+            "language": "ts",
+            "left": {
+                "label": "console.log",
+                "code": "console.log('user', user)\n// Output:\n// user { id: 'abc', name: 'John',\n//   email: 'j@x.com', ... }"
+            },
+            "right": {
+                "label": "Structured Logger",
+                "code": "logger.info('user loaded', {\n  userId: user.id,\n  timestamp: Date.now(),\n  requestId: ctx.reqId\n})"
+            }
+        }
+    },
+    {
+        "start": 18.5,
+        "end": 22,
+        "type": "code-block",
+        "data": {
+            "language": "ts",
+            "code": "import pino from 'pino'\n\nexport function createLogger(name: string) {\n  return pino({\n    name,\n    level: process.env.LOG_LEVEL || 'info',\n    transport: {\n      target: 'pino-pretty'\n    }\n  })\n}",
+            "fileName": "logger.ts"
+        }
+    },
+    {
+        "start": 22,
+        "end": 26,
+        "type": "terminal",
+        "data": {
+            "command": "LOG_LEVEL=debug node server.js",
+            "output": "[orders] INFO: payment processed\n  payment: { id: \"pay_123\", amount: 49.99 }\n  timestamp: 1708300000\n  requestId: \"req_abc\"",
+            "caption": "Searchable, filterable, useful"
+        }
+    },
+    {
+        "start": 26,
+        "end": 28.5,
+        "type": "callout",
+        "data": {
+            "text": "console.log is for prototyping. Structured logging is for production.",
+            "emphasizedTokens": [
+                "prototyping",
+                "production"
+            ]
+        }
+    }
+]

@@ -1,0 +1,87 @@
+[
+    {
+        "start": 0,
+        "end": 4,
+        "type": "code-block",
+        "data": {
+            "language": "ts",
+            "code": "app.get('/users', async (req, res) => {\n  const users = await db.query('SELECT * FROM users')\n  res.json(users)\n})",
+            "fileName": "server.ts"
+        }
+    },
+    {
+        "start": 4,
+        "end": 9,
+        "type": "code-evolve",
+        "data": {
+            "language": "ts",
+            "from": "app.get('/users', async (req, res) => {\n  const users = await db.query('SELECT * FROM users')\n  res.json(users)\n})",
+            "to": "app.get('/users', async (req, res) => {\n  try {\n    const users = await db.query('SELECT * FROM users')\n    const filtered = users.filter(u => u.active)\n    const mapped = filtered.map(u => ({\n      ...u, role: u.role || 'user'\n    }))\n    res.json(mapped)\n  } catch (e) {\n    res.status(500).json({ error: 'fail' })\n  }\n})",
+            "caption": "3 months of quick fixes later..."
+        }
+    },
+    {
+        "start": 9,
+        "end": 13,
+        "type": "code-highlight",
+        "data": {
+            "language": "ts",
+            "code": "app.get('/users', async (req, res) => {\n  try {\n    const users = await db.query('SELECT * FROM users')\n    const filtered = users.filter(u => u.active)\n    const mapped = filtered.map(u => ({\n      ...u, role: u.role || 'user'\n    }))\n    res.json(mapped)\n  } catch (e) {\n    res.status(500).json({ error: 'fail' })\n  }\n})",
+            "highlightLines": [
+                4,
+                5,
+                6,
+                7
+            ],
+            "fileName": "server.ts",
+            "caption": "Business logic buried in the route handler"
+        }
+    },
+    {
+        "start": 13,
+        "end": 17.5,
+        "type": "code-diff",
+        "data": {
+            "language": "ts",
+            "lines": [
+                " app.get('/users', async (req, res) => {",
+                "-  const users = await db.query('SELECT * FROM users')",
+                "-  const filtered = users.filter(u => u.active)",
+                "-  const mapped = filtered.map(u => ({",
+                "-    ...u, role: u.role || 'user'",
+                "-  }))",
+                "-  res.json(mapped)",
+                "+  const users = await userService.getActive()",
+                "+  res.json(users)"
+            ],
+            "fileName": "server.ts",
+            "caption": "Extract to a service layer"
+        }
+    },
+    {
+        "start": 17.5,
+        "end": 22,
+        "type": "code-compare",
+        "data": {
+            "language": "ts",
+            "left": {
+                "label": "Vibe Coded",
+                "code": "// 47 lines, no types, raw SQL\napp.get('/users', async (req, res) => {\n  const users = await db.query(\n    'SELECT * FROM users'\n  )\n  // ... 40 more lines\n})"
+            },
+            "right": {
+                "label": "Refactored",
+                "code": "// 4 lines, typed, clean\napp.get('/users', async (req, res) => {\n  const users = await userService.getActive()\n  res.json(users)\n})"
+            }
+        }
+    },
+    {
+        "start": 22,
+        "end": 26,
+        "type": "terminal",
+        "data": {
+            "command": "wc -l src/**/*.ts",
+            "output": "   2847 total\n   → 1200 lines are duplicated logic\n   → 400 lines are dead code",
+            "caption": "Half the codebase is waste"
+        }
+    }
+]

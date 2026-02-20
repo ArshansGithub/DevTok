@@ -1,23 +1,15 @@
 import React from 'react';
-import {
-    interpolate,
-    spring,
-    useCurrentFrame,
-    useVideoConfig,
-} from 'remotion';
+import { interpolate, useCurrentFrame } from 'remotion';
 import { STYLE } from '../config';
+import { useSceneTransition } from './useSceneTransition';
 import type { CodeDiffScene as CodeDiffSceneType } from '../schema';
 
 export const CodeDiffScene: React.FC<{
     data: CodeDiffSceneType['data'];
-}> = ({ data }) => {
+    durationInFrames: number;
+}> = ({ data, durationInFrames }) => {
     const frame = useCurrentFrame();
-    const { fps } = useVideoConfig();
-
-    const containerSpring = spring({ frame, fps, config: STYLE.motion.spring });
-    const containerOpacity = interpolate(frame, [0, 8], [0, 1], {
-        extrapolateRight: 'clamp',
-    });
+    const transition = useSceneTransition(durationInFrames);
 
     return (
         <div
@@ -26,8 +18,7 @@ export const CodeDiffScene: React.FC<{
                 top: 140,
                 left: STYLE.layout.padding - 8,
                 right: STYLE.layout.padding - 8,
-                opacity: containerOpacity,
-                transform: `scale(${interpolate(containerSpring, [0, 1], [0.95, 1])})`,
+                ...transition.style,
             }}
         >
             <div
@@ -42,9 +33,7 @@ export const CodeDiffScene: React.FC<{
                 {/* Title bar */}
                 <div
                     style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 8,
+                        display: 'flex', alignItems: 'center', gap: 8,
                         padding: '14px 20px',
                         borderBottom: `1px solid ${STYLE.colors.border}`,
                     }}
@@ -57,16 +46,10 @@ export const CodeDiffScene: React.FC<{
                             {data.fileName}
                         </span>
                     )}
-                    <span
-                        style={{
-                            fontFamily: STYLE.fonts.mono,
-                            fontSize: 13,
-                            color: STYLE.colors.accent,
-                            fontWeight: 700,
-                            marginLeft: 'auto',
-                            letterSpacing: 2,
-                        }}
-                    >
+                    <span style={{
+                        fontFamily: STYLE.fonts.mono, fontSize: 13, color: STYLE.colors.accent,
+                        fontWeight: 700, marginLeft: 'auto', letterSpacing: 2,
+                    }}>
                         DIFF
                     </span>
                 </div>
@@ -76,8 +59,7 @@ export const CodeDiffScene: React.FC<{
                     {data.lines.map((line, i) => {
                         const delay = i * 3;
                         const lineOpacity = interpolate(frame, [delay + 2, delay + 8], [0, 1], {
-                            extrapolateLeft: 'clamp',
-                            extrapolateRight: 'clamp',
+                            extrapolateLeft: 'clamp', extrapolateRight: 'clamp',
                         });
 
                         const prefix = line.charAt(0);
@@ -96,17 +78,10 @@ export const CodeDiffScene: React.FC<{
                         }
 
                         return (
-                            <div
-                                key={i}
-                                style={{
-                                    padding: '2px 20px',
-                                    background: bgColor,
-                                    color: textColor,
-                                    opacity: lineOpacity,
-                                    display: 'flex',
-                                    gap: 12,
-                                }}
-                            >
+                            <div key={i} style={{
+                                padding: '2px 20px', background: bgColor, color: textColor,
+                                opacity: lineOpacity, display: 'flex', gap: 12,
+                            }}>
                                 <span style={{ color: prefixColor, fontWeight: 700, width: 14, flexShrink: 0, textAlign: 'center' }}>
                                     {prefix === '+' || prefix === '-' ? prefix : ' '}
                                 </span>
@@ -118,21 +93,12 @@ export const CodeDiffScene: React.FC<{
                     })}
                 </div>
 
-                {/* Caption */}
                 {data.caption && (
-                    <div
-                        style={{
-                            padding: '8px 20px 16px',
-                            fontFamily: STYLE.fonts.heading,
-                            fontSize: 18,
-                            color: STYLE.colors.textMuted,
-                            fontStyle: 'italic',
-                            opacity: interpolate(frame, [6, 16], [0, 1], {
-                                extrapolateLeft: 'clamp',
-                                extrapolateRight: 'clamp',
-                            }),
-                        }}
-                    >
+                    <div style={{
+                        padding: '8px 20px 16px', fontFamily: STYLE.fonts.heading,
+                        fontSize: 18, color: STYLE.colors.textMuted, fontStyle: 'italic',
+                        opacity: interpolate(frame, [6, 16], [0, 1], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }),
+                    }}>
                         {data.caption}
                     </div>
                 )}

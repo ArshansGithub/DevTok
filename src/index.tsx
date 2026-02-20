@@ -8,73 +8,55 @@ import React from 'react';
 import { OverlayComposition, type OverlayProps } from './renderer/Overlay';
 import { DEFAULTS } from './config';
 
-// Code-heavy sample storyboard for Remotion Studio preview
+// Code-only sample storyboard for Remotion Studio preview
 const sampleStoryboard: OverlayProps['storyboard'] = [
     {
         start: 0,
-        end: 2,
-        type: 'title',
-        data: {
-            text: 'Why Vibe Coding Breaks',
-            subtitle: 'The accretion debt problem',
-        },
-    },
-    {
-        start: 2,
-        end: 5.5,
+        end: 4,
         type: 'code-block',
         data: {
             language: 'ts',
-            code: `type User = {\n  id: string\n  name: string\n}`,
-            fileName: 'types.ts',
+            code: `app.get('/users', async (req, res) => {\n  const users = await db.query('SELECT * FROM users')\n  res.json(users)\n})`,
+            fileName: 'server.ts',
         },
     },
     {
-        start: 5.5,
-        end: 10,
+        start: 4,
+        end: 9,
         type: 'code-evolve',
         data: {
             language: 'ts',
-            from: `type User = {\n  id: string\n  name: string\n}`,
-            to: `type User = {\n  id: string\n  name: string\n  status: 'active' | 'disabled'\n  role?: string\n  lastLogin?: Date\n}`,
-            caption: 'Types keep growing...',
+            from: `app.get('/users', async (req, res) => {\n  const users = await db.query('SELECT * FROM users')\n  res.json(users)\n})`,
+            to: `app.get('/users', async (req, res) => {\n  try {\n    const users = await db.query('SELECT * FROM users')\n    const filtered = users.filter(u => u.active)\n    res.json(filtered)\n  } catch (e) {\n    res.status(500).json({ error: 'fail' })\n  }\n})`,
+            caption: '3 months of quick fixes...',
         },
     },
     {
-        start: 10,
-        end: 14,
+        start: 9,
+        end: 13,
         type: 'code-diff',
         data: {
             language: 'ts',
             lines: [
-                ' function getUser(id: string) {',
-                '-  return db.query(id)',
-                '+  const user = db.query(id)',
-                '+  if (!user) throw new NotFound()',
-                '+  return sanitize(user)',
-                ' }',
+                ' app.get(\'/users\', async (req, res) => {',
+                '-  const users = await db.query(\'SELECT * FROM users\')',
+                '-  const filtered = users.filter(u => u.active)',
+                '-  res.json(filtered)',
+                '+  const users = await userService.getActive()',
+                '+  res.json(users)',
             ],
-            fileName: 'users.ts',
-            caption: 'Every fix adds more wrapping',
+            fileName: 'server.ts',
+            caption: 'Extract to a service layer',
         },
     },
     {
-        start: 14,
-        end: 17.5,
+        start: 13,
+        end: 17,
         type: 'terminal',
         data: {
             command: 'npm run build',
             output: 'ERROR: Property "status" does not exist\n  on type "User"\n\n  Found 12 errors.',
             caption: 'The build finally breaks',
-        },
-    },
-    {
-        start: 17.5,
-        end: 20,
-        type: 'callout',
-        data: {
-            text: 'Refactor early. Integrate, don\'t accumulate.',
-            emphasizedTokens: ['Refactor early', 'Integrate'],
         },
     },
 ];

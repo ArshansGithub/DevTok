@@ -5,23 +5,7 @@ const BaseSceneSchema = z.object({
 	end: z.number(),
 });
 
-// ─── Kept Scenes ────────────────────────────────────────────
-
-export const TitleSceneSchema = BaseSceneSchema.extend({
-	type: z.literal('title'),
-	data: z.object({
-		text: z.string(),
-		subtitle: z.string().optional(),
-	}),
-});
-
-export const CalloutSceneSchema = BaseSceneSchema.extend({
-	type: z.literal('callout'),
-	data: z.object({
-		text: z.string(),
-		emphasizedTokens: z.array(z.string()).optional(),
-	}),
-});
+// ─── Code-Centric Scene Types ───────────────────────────────
 
 export const CodeBlockSceneSchema = BaseSceneSchema.extend({
 	type: z.literal('code-block'),
@@ -42,7 +26,7 @@ export const CodeEvolveSceneSchema = BaseSceneSchema.extend({
 			.array(
 				z.object({
 					token: z.string(),
-					at: z.number(), // 0–1 fraction of beat duration
+					at: z.number(),
 				}),
 			)
 			.optional(),
@@ -50,13 +34,10 @@ export const CodeEvolveSceneSchema = BaseSceneSchema.extend({
 	}),
 });
 
-// ─── New Code-Centric Scenes ────────────────────────────────
-
 export const CodeDiffSceneSchema = BaseSceneSchema.extend({
 	type: z.literal('code-diff'),
 	data: z.object({
 		language: z.string(),
-		/** Each line prefixed with "+" (added), "-" (removed), or " " (context) */
 		lines: z.array(z.string()),
 		fileName: z.string().optional(),
 		caption: z.string().optional(),
@@ -83,7 +64,6 @@ export const CodeHighlightSceneSchema = BaseSceneSchema.extend({
 	data: z.object({
 		language: z.string(),
 		code: z.string(),
-		/** 1-indexed line numbers to highlight */
 		highlightLines: z.array(z.number()),
 		fileName: z.string().optional(),
 		caption: z.string().optional(),
@@ -111,8 +91,6 @@ export const CodeScrollSceneSchema = BaseSceneSchema.extend({
 // ─── Union & Exports ────────────────────────────────────────
 
 export const SceneSchema = z.discriminatedUnion('type', [
-	TitleSceneSchema,
-	CalloutSceneSchema,
 	CodeBlockSceneSchema,
 	CodeEvolveSceneSchema,
 	CodeDiffSceneSchema,
@@ -125,8 +103,6 @@ export const SceneSchema = z.discriminatedUnion('type', [
 export const StoryboardSchema = z.array(SceneSchema);
 
 // Types
-export type TitleScene = z.infer<typeof TitleSceneSchema>;
-export type CalloutScene = z.infer<typeof CalloutSceneSchema>;
 export type CodeBlockScene = z.infer<typeof CodeBlockSceneSchema>;
 export type CodeEvolveScene = z.infer<typeof CodeEvolveSceneSchema>;
 export type CodeDiffScene = z.infer<typeof CodeDiffSceneSchema>;

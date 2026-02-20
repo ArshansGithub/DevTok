@@ -1,0 +1,97 @@
+[
+    {
+        "start": 0,
+        "end": 2,
+        "type": "title",
+        "data": {
+            "text": "Why My Build Broke",
+            "subtitle": "A case-sensitivity nightmare"
+        }
+    },
+    {
+        "start": 2,
+        "end": 5.5,
+        "type": "code-block",
+        "data": {
+            "language": "ts",
+            "code": "import { formatDate } from './Utils'\nimport { validateEmail } from './Utils'\nimport { hashPassword } from './Utils'",
+            "fileName": "auth.ts"
+        }
+    },
+    {
+        "start": 5.5,
+        "end": 9.5,
+        "type": "terminal",
+        "data": {
+            "command": "git push origin main",
+            "output": "remote: Build started...\nremote: \nremote: ✗ Module not found: './Utils'\nremote: \nremote: Build FAILED",
+            "caption": "Works on Mac, breaks on Linux CI"
+        }
+    },
+    {
+        "start": 9.5,
+        "end": 13,
+        "type": "code-compare",
+        "data": {
+            "language": "bash",
+            "left": {
+                "label": "macOS (case-insensitive)",
+                "code": "# Both resolve to same file:\nimport from './Utils'\nimport from './utils'\n# ✓ No error"
+            },
+            "right": {
+                "label": "Linux CI (case-sensitive)",
+                "code": "# File is actually: utils.ts\nimport from './Utils'\n# ✗ MODULE_NOT_FOUND\nimport from './utils'\n# ✓ Works"
+            }
+        }
+    },
+    {
+        "start": 13,
+        "end": 17,
+        "type": "code-diff",
+        "data": {
+            "language": "ts",
+            "lines": [
+                "-import { formatDate } from './Utils'",
+                "-import { validateEmail } from './Utils'",
+                "-import { hashPassword } from './Utils'",
+                "+import { formatDate } from './utils'",
+                "+import { validateEmail } from './utils'",
+                "+import { hashPassword } from './utils'"
+            ],
+            "fileName": "auth.ts",
+            "caption": "The fix: match exact file casing"
+        }
+    },
+    {
+        "start": 17,
+        "end": 21,
+        "type": "code-block",
+        "data": {
+            "language": "json",
+            "code": "// .eslintrc.json\n{\n  \"rules\": {\n    \"import/no-unresolved\": \"error\"\n  }\n}",
+            "fileName": ".eslintrc.json"
+        }
+    },
+    {
+        "start": 21,
+        "end": 25,
+        "type": "terminal",
+        "data": {
+            "command": "docker run --rm -v $(pwd):/app node:20 npm test",
+            "output": "✓ 42 tests passed\n✓ No import errors\n✓ Build succeeded",
+            "caption": "Test in a Linux container before pushing"
+        }
+    },
+    {
+        "start": 25,
+        "end": 27.5,
+        "type": "callout",
+        "data": {
+            "text": "Never trust your local machine. CI is the real world.",
+            "emphasizedTokens": [
+                "Never trust",
+                "CI"
+            ]
+        }
+    }
+]

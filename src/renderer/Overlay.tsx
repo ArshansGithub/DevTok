@@ -1,13 +1,11 @@
 /**
  * Remotion Overlay Composition
- * Maps storyboard beats to code-centric scene components.
+ * Maps storyboard beats to code-centric scene components with smooth transitions.
  */
 
 import React from 'react';
 import { AbsoluteFill, Sequence, useVideoConfig } from 'remotion';
 import type { Storyboard, Scene } from '../schema';
-import { TitleScene } from './TitleScene';
-import { CalloutScene } from './CalloutScene';
 import { CodeBlockScene } from './CodeBlockScene';
 import { CodeEvolveScene } from './CodeEvolveScene';
 import { CodeDiffScene } from './CodeDiffScene';
@@ -36,27 +34,16 @@ function renderScene(
     const h = highlightedCode?.[index];
 
     switch (scene.type) {
-        case 'title':
-            return <TitleScene data={scene.data} />;
-        case 'callout':
-            return <CalloutScene data={scene.data} />;
         case 'code-block':
-            return <CodeBlockScene data={scene.data} highlightedHtml={h?.html} />;
+            return <CodeBlockScene data={scene.data} highlightedHtml={h?.html} durationInFrames={durationInFrames} />;
         case 'code-evolve':
-            return (
-                <CodeEvolveScene
-                    data={scene.data}
-                    fromHtml={h?.fromHtml}
-                    toHtml={h?.toHtml}
-                    durationInFrames={durationInFrames}
-                />
-            );
+            return <CodeEvolveScene data={scene.data} fromHtml={h?.fromHtml} toHtml={h?.toHtml} durationInFrames={durationInFrames} />;
         case 'code-diff':
-            return <CodeDiffScene data={scene.data} />;
+            return <CodeDiffScene data={scene.data} durationInFrames={durationInFrames} />;
         case 'code-compare':
-            return <CodeCompareScene data={scene.data} leftHtml={h?.leftHtml} rightHtml={h?.rightHtml} />;
+            return <CodeCompareScene data={scene.data} leftHtml={h?.leftHtml} rightHtml={h?.rightHtml} durationInFrames={durationInFrames} />;
         case 'code-highlight':
-            return <CodeHighlightScene data={scene.data} highlightedHtml={h?.html} />;
+            return <CodeHighlightScene data={scene.data} highlightedHtml={h?.html} durationInFrames={durationInFrames} />;
         case 'terminal':
             return <TerminalScene data={scene.data} durationInFrames={durationInFrames} />;
         case 'code-scroll':
